@@ -100,4 +100,15 @@ class AppController extends Controller
     }
 
 
+    public function logout(Request $request)
+    {
+
+        $user = $request->user();
+
+        return $user;
+        
+        return $this->sendResponse([], 'User logged out successfully.');
+    }
+
+
 }

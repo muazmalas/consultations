@@ -59,4 +59,11 @@ class RegisterController extends BaseController
 
         return $this->sendResponse($success, 'User login successfully.');
     }
+
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->sendResponse([], 'User logged out successfully.');
+    }
 }
