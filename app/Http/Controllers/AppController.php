@@ -57,6 +57,7 @@ class AppController extends Controller
     {  
         
         $userBalance = User::findOrFail($request->user_id)->balance;
+        $expertBalance = User::findOrFail($request->expert_id)->balance;
         $consultationFee = Consultation::findOrFail($request->consultation_id)->fee_amount;
         $appointments = Appointment::where('expert_id', $request->expert_id)->where('from_time', $request->from_time)->get();
 
@@ -77,6 +78,10 @@ class AppController extends Controller
 
                     User::where('id', $request->user_id)->update([
                         'balance' => $userBalance - $consultationFee
+                    ]);
+
+                    User::where('id', $request->expert_id)->update([
+                        'balance' => $expertBalance + $consultationFee
                     ]);
         
                     return 'Appointment Created Successfully';

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
    
 use Validator;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -25,6 +26,7 @@ class RegisterController extends BaseController
             'role_id' => 'required|integer|min:1|max:2',
             'password' => 'required',
             'c_password' => 'required|same:password',
+            'pic' => 'mimes:jpg,jpeg,bmp,png|max:10000'
         ]);
    
         if($validator->fails()){
@@ -33,6 +35,18 @@ class RegisterController extends BaseController
    
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
+
+        if ($file = $request->file('pic'))
+        {
+            $extension       = $file->getClientOriginalExtension() ?: 'png';
+            $folderName      = '/public/images/';
+            $destinationPath = base_path() . $folderName;
+            $safeName        = Str::random(10).'.'.$extension;
+            $file->move($destinationPath, $safeName);
+
+            $input['pic'] = $safeName;
+        }
+        
         $user = User::create($input);
         $success['token'] =  $user->createToken('consult')->plainTextToken;
         $success['name'] =  $user->name;
@@ -66,4 +80,5 @@ class RegisterController extends BaseController
         $request->user()->currentAccessToken()->delete();
         return $this->sendResponse([], 'User logged out successfully.');
     }
+
 }
